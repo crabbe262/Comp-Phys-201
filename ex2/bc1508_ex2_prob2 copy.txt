@@ -1,0 +1,90 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+int main()
+{
+    double theta, h, sum, r, route, s, x, th2, term, result, l, g, lg, s1, s12 ,s2,s22;
+    int N, i;
+
+    l = 1; //let length equal 1
+    g = 9.81;
+    lg = l/g;
+
+    N=100000;//enter nummber of points
+
+    h = (M_PI/2)/N;
+
+    printf("theta\t\tT\n");
+
+    for(theta=0; theta<=M_PI; theta=theta+0.01)
+    {
+        sum = 0;
+        x = 0;
+
+        th2 = theta/2;
+
+        s1 = sin(th2);
+        s12 = pow(s1,2);
+
+
+        /* this code calculates the f(x0) term*/
+        s2 = sin(x);
+        s22 = pow(s2,2);
+        s = s12*s22;
+        r = 1-s;
+        route = sqrt(r);
+        term = 1/route;
+        sum = term;
+
+
+        /* this code calculates the odd terms*/
+        for(i=1; i<N; i=i+2)
+        {
+            x = (i*h);
+
+            s2 = sin(x);
+            s22 = pow(s2,2);
+            s = s12*s22;
+            r = 1-s;
+            route = sqrt(r);
+            term = 1/route;
+            sum = sum + (4*term);
+        }
+
+         x = 0;
+        /* this code calculates the even terms*/
+        for(i=2; i<N; i=i+2)
+        {
+            x = (i*h);
+
+
+            s2 = sin(x);
+            s22 = pow(s2,2);
+            s = s12*s22;
+            r = 1-s;
+            route = sqrt(r);
+            term = 1/route;
+            sum = sum + (2*term);
+        }
+        /*calculate f(xN) term*/
+
+        x = N*h;
+
+        s = sin(th2)*sin(x);
+        r = 1-s;
+        route = sqrt(r);
+        term = 1/route;
+        sum = sum + (2*term);
+
+
+        result = 4*sqrt(lg)*(h/3)*sum;
+
+        printf("%lf\t%lf\n",theta, result);
+
+
+
+
+    }
+    return 0;
+}

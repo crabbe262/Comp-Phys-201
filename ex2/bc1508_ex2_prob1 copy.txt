@@ -1,0 +1,45 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+
+int main()
+{
+    double x, fx, dffx, dfcx, dfx;
+    double h, xph, fxph, xmh, fxmh;
+    double errf, errc, j;
+
+
+    printf("x \t\t f(x) \t\t f'(x) \t\t f'f(x) \t f'c(x) \t\t Err f \t Err c\n" );
+
+    for(x=0; x<=6.3; x=x+0.05)
+    {
+
+        h = 1e-7;
+        fx = sin(x);
+
+        dfx = cos(x);//analytic result for comparison
+
+        xph = x + h;
+        xmh = x - h;
+
+        fxph = sin(xph);//f(x+h) = sin(x+h)
+        fxmh = sin(xmh);//f(x-h) = sin(x-h)
+
+        dffx = (fxph-fx)/h;
+        dfcx = (fxph-fxmh)/(2*h);
+
+        j = dfx - dffx;
+        errf = fabs(j);
+        j = dfx -dfcx;
+        errc = fabs(j);
+
+        printf("%lf\t%lf\t%lf\t%lf\t%lf\t%1.15lf\t%1.15lf\n", x ,fx, dfx, dffx, dfcx, errf, errc);
+
+    }
+
+
+
+
+    return 0;
+}

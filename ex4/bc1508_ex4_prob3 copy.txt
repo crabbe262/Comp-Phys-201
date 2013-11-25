@@ -1,0 +1,157 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+int main()
+{
+    double M1, M2, G, x1, y1, x2, y2, vx1, vy1, vx2,vy2, t, h, xh1, yh1, xh2, yh2, rad1, rad2, r, x12, y12, x21, y21;
+    double k1x1, k1y1, k1vx1, k1vy1, k2x1, k2y1, k2vx1, k2vy1, k3x1, k3y1, k3vx1, k3vy1, k4x1, k4y1, k4vx1, k4vy1;
+    double k1x2, k1y2, k1vx2, k1vy2, k2x2, k2y2, k2vx2, k2vy2, k3x2, k3y2, k3vx2, k3vy2, k4x2, k4y2, k4vx2, k4vy2;
+
+
+    h = 70;//time step size
+    G = 6.67300E-11;//m3 kg-1 s-2 - Grativational constant
+    M1 = 5.9736E24;//kg - mass of the earth
+    M2 = 7.3477E22;//kg - mass of moon
+    rad1 = 6371E3;
+    rad2 = 1737.10E3;
+
+    /*initial conditions*/
+    /*earth*/
+    t = 0;
+    x1 = -4678.069256E3;
+    y1 = 0;
+    vx1 = 0;
+    vy1 = -12;
+    /*moon*/
+    x2 = 380321.930E3;
+    y2 = 0;
+    vx2 = 0;
+    vy2 = 1023;
+
+    printf("t(s)\t x1(m)\t y1(m)\t x2(m)\t y2(m)\t");
+    printf("%lf\t%lf\t%lf\t%lf\t%lf\n",t,x1,y1,x2,y2);
+
+
+    while(t<6*2360585)
+    {
+        /* k1 */
+
+        k1x1 = vx1;
+        k1y1 = vy1;
+        k1x2 = vx2;
+        k1y2 = vy2;
+
+        x12 = x2-x1;
+        y12 = y2 -y1;
+        x21 = -x12;
+        y21 = -y12;
+        r = sqrt(pow(x12,2)+pow(y12,2));//distance between particles
+
+
+        k1vx1 = -(M2*G*(x21))/pow(fabs(r),3);
+        k1vy1 = -(M2*G*(y21))/pow(fabs(r),3);
+        k1vx2 = -(M1*G*(x12))/pow(fabs(r),3);
+        k1vy2 = -(M1*G*(y12))/pow(fabs(r),3);
+
+        /* k2 */
+
+        k2x1 = vx1 + (h*k1vx1)/2;
+        k2y1 = vy1 + (h*k1vy1)/2;
+        k2x2 = vx2 + (h*k1vx2)/2;
+        k2y2 = vy2 + (h*k1vy2)/2;
+
+        xh1 = x1 + (h*k1x1)/2;
+        yh1 = y1 + (h*k1y1)/2;
+        xh2 = x2 + (h*k1x2)/2;
+        yh2 = y2 + (h*k1y2)/2;
+        x12 = xh2-xh1;
+        y12 = yh2 -yh1;
+        x21 = -x12;
+        y21 = -y12;
+        r = sqrt(pow(x12,2)+pow(y12,2));//distance between particles
+
+        k2vx1 = -(M2*G*(x21))/pow(fabs(r),3);
+        k2vy1 = -(M2*G*(y21))/pow(fabs(r),3);
+        k2vx2 = -(M1*G*(x12))/pow(fabs(r),3);
+        k2vy2 = -(M1*G*(y12))/pow(fabs(r),3);
+
+        /* k3 */
+
+        k3x1 = vx1 + (h*k2vx1)/2;
+        k3y1 = vy1 + (h*k2vy1)/2;
+        k3x2 = vx2 + (h*k2vx2)/2;
+        k3y2 = vy2 + (h*k2vy2)/2;
+
+        xh1 = x1 + (h*k2x1)/2;
+        yh1 = y1 + (h*k2y1)/2;
+        xh2 = x2 + (h*k2x2)/2;
+        yh2 = y2 + (h*k2y2)/2;
+        x12 = xh2-xh1;
+        y12 = yh2 -yh1;
+        x21 = -x12;
+        y21 = -y12;
+        r = sqrt(pow(x12,2)+pow(y12,2));//distance between particles
+
+        k3vx1 = -(M2*G*(x21))/pow(fabs(r),3);
+        k3vy1 = -(M2*G*(y21))/pow(fabs(r),3);
+        k3vx2 = -(M1*G*(x12))/pow(fabs(r),3);
+        k3vy2 = -(M1*G*(y12))/pow(fabs(r),3);
+
+        /* k4 */
+
+        k4x1 = vx1 + (h*k3vx1);
+        k4y1 = vy1 + (h*k3vy1);
+        k4x2 = vx2 + (h*k3vx2);
+        k4y2 = vy2 + (h*k3vy2);
+
+        xh1 = x1 + (h*k3x1);
+        yh1 = y1 + (h*k3y1);
+        xh2 = x2 + (h*k3x2);
+        yh2 = y2 + (h*k3y2);
+        x12 = xh2-xh1;
+        y12 = yh2 -yh1;
+        x21 = -x12;
+        y21 = -y12;
+        r = sqrt(pow(x12,2)+pow(y12,2));//distance between particles
+
+        k4vx1 = -(M2*G*(x21))/pow(fabs(r),3);
+        k4vy1 = -(M2*G*(y21))/pow(fabs(r),3);
+        k4vx2 = -(M1*G*(x12))/pow(fabs(r),3);
+        k4vy2 = -(M1*G*(y12))/pow(fabs(r),3);
+
+        /* time stepping eqns */
+        x1 = x1 + (h/6)*(k1x1 + 2*k2x1 + 2*k3x1 + k4x1);
+        y1 = y1 + (h/6)*(k1y1 + 2*k2y1 + 2*k3y1 + k4y1);
+        vx1 = vx1 + (h/6)*(k1vx1 + 2*k2vx1 + 2*k3vx1 + k4vx1);
+        vy1 = vy1 + (h/6)*(k1vy1 + 2*k2vy1 + 2*k3vy1 + k4vy1);
+        x2 = x2 + (h/6)*(k1x2 + 2*k2x2 + 2*k3x2 + k4x2);
+        y2 = y2 + (h/6)*(k1y2 + 2*k2y2 + 2*k3y2 + k4y2);
+        vx2 = vx2 + (h/6)*(k1vx2 + 2*k2vx2 + 2*k3vx2 + k4vx2);
+        vy2 = vy2 + (h/6)*(k1vy2 + 2*k2vy2 + 2*k3vy2 + k4vy2);
+        t = t + h;
+
+
+
+        r = sqrt(pow(x12,2)+pow(y12,2));//total distance between particles
+
+
+
+
+        if(r<rad1+rad2)
+        {
+            printf("particles have crashed\n");
+            return 0;
+        }
+
+
+
+        printf("%lf\t%lf\t%lf\t%lf\t%lf\n",t,x1,y1,x2,y2);
+
+
+
+    }
+
+
+    return 0;
+}

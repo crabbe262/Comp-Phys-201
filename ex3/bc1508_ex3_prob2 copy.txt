@@ -1,0 +1,81 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+int main()
+{
+    double yn, yn1, vn, vn1, vnsqr, t, stept, g, K, Cd, p, A, M, lvn, z, y, k, s, d, h, p0, c, vmax, yvmax;
+
+
+    vn = 0;//starting speed
+    yn = 39045;//starting hight = 1 km
+    t = 0;//time initialized to zero
+
+    stept = 0.0001;
+
+    g = 9.81;
+    M = 190;//mass = 190 kg
+    Cd = 1; //drag coefficent
+    A = 1.4; //cross sectional area 1.4 m^2
+    p0 = 1.2; //air density 1.2 kg m^-3
+    h = 7.64E3;//scale height
+
+    printf("computed values:\n");
+    printf("t(s)\t y(m)\t speed(m/s)\t\n");
+    printf("%.1lf\t%lf\t%lf\n", t, yn, vn);
+    vmax=0;
+
+    while(yn>=0)//while loop untill he reaches the ground
+    {
+        c = -yn/h;
+        p = p0*exp(c);
+        K = (Cd*p*A)/2;
+        vnsqr = fabsf(vn)*vn;
+        vn1 = vn - stept*(g + ((K*vnsqr)/M));
+
+        yn1 = yn + (stept*vn);
+
+        vn = vn1;
+        yn = yn1;
+
+        if(vn>vmax)
+        {
+            vmax = vn;
+        }
+
+        t = t + stept;
+
+        /* this code prints values to the screen for analysis at 0.5 s intervals */
+        lvn = fabsf(vn);
+        k = 2*t;
+        z = fmodf(k,1);
+        y = fabs(z);
+        if(y<(stept)/2)
+        {
+            printf("%.1lf\t%lf\t%lf\n", t, yn, lvn);
+        }
+         if(lvn>vmax)
+        {
+            vmax = lvn;
+            yvmax = yn;
+
+        }
+
+
+    }
+
+    s = yn/vn;//calculates the exact time of impact from the slight overshoot
+    d = t - s;
+   // printf("impact at t=%lf\n", d);
+    printf(" reached a max speed of: %lf m/s and fell for%lf s\n", vmax, d);
+
+
+
+
+
+
+
+
+
+    return 0;
+}

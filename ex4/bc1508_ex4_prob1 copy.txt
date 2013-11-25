@@ -1,0 +1,130 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+int main()
+{
+    double t, x, y, vx, vy, h;
+    double xs, ys, xh, yh, d, e, z;
+    double U, E, KE, v2,r, s;
+    double x1, y1, vx1, vy1, t1;//stepped variables
+    double k1x, k2x, k3x, k4x, k1y, k2y, k3y, k4y, k1vx, k2vx, k3vx, k4vx, k1vy, k2vy, k3vy, k4vy;
+    double G, M, m;
+
+    /*constants*/
+    G = 6.67300E-11;//m3 kg-1 s-2 - Grativational constant
+    M = 5.92719E24;//kg - mass of the earth
+    m = 1;//kg - orbiting mass
+    t = 0;//s
+    h = 15;//s - time step
+
+    /*initial conditions- geostationary circular orbit init conds */
+    x = 0;//m
+    y = 35786e3;//m
+    vx = 3323.768462;//m/s
+    vy = 0;//m/s
+
+    //printf("t\tx\ty\tvx\tvy\n");
+    printf("time (s)\t radius (m)\t speed (m/s)\t Total energy (J)\n");
+
+    printf("%lf\t%lf\t%lf\t%lf\n",t, r, s,E);
+    //printf("%lf\t%lf\t%lf\t%lf\t%lf\n", t,x,y,vx,vy);
+    //printf("%lf\t%lf\n",x, y);
+    /*__*/
+    while(t<=(2*86400))
+    {
+
+        k1x = vx;
+        k1y = vy;
+
+        xs = pow(x, 2);  //tempary variables for the calculation
+        ys = pow(y, 2);
+        z = xs+ys;
+        e = pow(z,1.5);
+        d = fabsf(e);
+        k1vx = (-G*M*x)/d;
+        k1vy = (-G*M*y)/d;
+
+
+        k2x = vx + (h*k1vx)/2;
+        k2y = vy + (h*k1vy)/2;
+
+        xh = x + (h*k1x)/2;
+        yh = y + (h*k1y)/2;
+        xs = pow(xh,2);  //tempary variables for the calculation
+        ys = pow(yh,2);
+        z = xs+ys;
+        e = pow(z,1.5);
+        d = fabsf(e);
+        k2vx = (-G*M*xh)/d;
+        k2vy = (-G*M*yh)/d;
+
+
+        k3x = vx + (h*k2vx)/2;
+        k3y = vy + (h*k2vy)/2;
+
+        xh = x + (h*k2x)/2;
+        yh = y + (h*k2y)/2;
+        xs = pow(xh,2);  //tempary variables for the calculation
+        ys = pow(yh,2);
+        z = xs+ys;
+        e = pow(z,1.5);
+        d = fabsf(e);
+        k3vx = (-G*M*xh)/d;
+        k3vy = (-G*M*yh)/d;
+
+
+        k4x = vx + h*k3vx;
+        k4y = vy + h*k3vy;
+
+        xh = x + h*k3x;
+        yh = y + h*k3y;
+        xs = pow(xh,2);  //tempary variables for the calculation
+        ys = pow(yh,2);
+        z = xs+ys;
+        e = pow(z,1.5);
+        d = fabsf(e);
+        k4vx = (-G*M*xh)/d;
+        k4vy = (-G*M*yh)/d;
+
+
+        /* time stepping eqns */
+        x1 = x + (h/6)*(k1x + 2*k2x + 2*k3x + k4x);
+        y1 = y + (h/6)*(k1y + 2*k2y + 2*k3y + k4y);
+        vx1 = vx + (h/6)*(k1vx + 2*k2vx + 2*k3vx + k4vx);
+        vy1 = vy + (h/6)*(k1vy + 2*k2vy + 2*k3vy + k4vy);
+        t1 = t + h;
+
+        x = x1;
+        y = y1;
+        vx = vx1;
+        vy = vy1;
+        t = t1;
+
+        /*energy calculations*/
+
+
+        r = sqrtf(pow(x,2)+pow(y,2));
+        s = sqrtf(pow(vx,2)+pow(vy,2));
+
+        U = -(G*M*m)/r;
+        v2 = pow(s,2);
+        KE = (m*v2)/2;
+        E = KE+U;
+        //printf("%lf\t%lf\t%lf\t%lf\t%lf\n",t,x,y,vx,vy);
+       printf("%lf\t%lf\t%lf\t%lf\n",t, r, s,E);
+      // printf("%lf\t%lf\n",x, y);
+       if(r<=6378.1E3)//if radius of orbit is smaller than radius of the earth the satelite crashes
+       {
+           printf("the particle has crashed!\n");
+           return 0;
+       }
+       if(E>0)
+       {
+           printf("the particle has reached escape velocity\n");
+       }
+    }
+
+
+    return 0;
+}

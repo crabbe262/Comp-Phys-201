@@ -1,0 +1,90 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+int main()
+{
+    double yn, yn1, vn, vn1, vnsqr, t, stept, g, K, Cd, p, A, M, lvn, z, y, k, s, d;
+    double ya, va, lva;//analytical calculation variables
+
+    vn = 0;//starting speed
+    yn = 1E3;//starting hight = 1 km
+    t = 0;//time initialized to zero
+
+    stept = 0.0001;
+
+    g = 9.81;
+    M = 100;//mass = 100 kg
+    Cd = 0.8; //drag coefficent
+    A = 1.4; //cross sectional area 1.4 m^2
+    p = 1.2; //air density 1.2 kg m^-3
+    K = (Cd*p*A)/2;
+
+
+    printf("computed values:\n");
+    printf("t(s)\t y(m)\t speed(m/s)\t\n");
+    printf("%.1lf\t%lf\t%lf\n", t, yn, vn);
+
+    while(yn>=0)//while loop untill he reaches the ground
+    {
+
+
+        vnsqr = fabsf(vn)*vn;
+        vn1 = vn - stept*(g + ((K*vnsqr)/M));
+
+        yn1 = yn + (stept*vn);
+
+        vn = vn1;
+        yn = yn1;
+
+
+        t = t + stept;
+
+        /* this code prints values to the screen for analysis at 0.5 s intervals */
+        lvn = fabsf(vn);
+        k = 2*t;
+        z = fmodf(k,1);
+        y = fabs(z);
+        if(y<(stept)/2)
+        {
+            printf("%.1lf\t%lf\t%lf\n", t, yn, lvn);
+        }
+
+    }
+
+    s = yn/vn;//calculates the exact time of impact from the slight overshoot
+    d = t - s;
+    printf("impact at t=%lf\n", d);
+
+       /*this next bit of code calculates the analytical values*/
+     printf("analytical values:\n");
+    printf("t(s)\t y(m)\t speed(m/s)\t\n");
+    t = 0;
+
+    while(ya>=0)
+    {
+        ya = 1E3 -(M/(2*K))*log(pow(coshf((sqrt((K*g)/M))*t),2));
+        va = -sqrt((M*g)/K)*tanhf((sqrt((K*g)/M))*t);
+        lva = fabsf(va);
+
+        k = 2*t;//prints values at 0.5 s intervals for comparison with the other values
+        z = fmodf(k,1);
+        y = fabs(z);
+
+        if(y<(stept/2))
+        {
+            printf("%.1lf\t%lf\t%lf\n", t, ya, lva);
+        }
+
+
+
+        t = t + stept;
+    }
+    s = ya/va;
+    d = t - s;
+    printf("impact at t=%lf\n", d);
+
+
+
+    return 0;
+}

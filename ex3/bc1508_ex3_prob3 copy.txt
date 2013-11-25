@@ -1,0 +1,219 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+int main()
+{
+    double Vn[30][15], Vo[30][15];//two arrays, Vold and Vnew
+    double Ex[30][15], Ey[30][15];//arrays to store electric field components
+    double diff, absdiff, maxdiff;
+    int i, j, il, ir, ju, jd, N;
+
+
+    for(i=0; i<30; i++)//initializes both arrays to 0
+    {
+        for(j=0; j<15; j++)
+        {
+            Vn[i][j] = 0;
+            Vo[i][j] = 0;
+        }
+    }
+
+    for(j=6; j<9; j++)//sets left conductor to -10V
+    {
+        for(i=6; i<9; i++)
+        {
+            Vn[i][j] = -10;
+            Vo[i][j] = -10;
+        }
+        for(i=21; i<24; i++)//sets right conductor to 10V
+        {
+            Vn[i][j] = 10;
+            Vo[i][j] = 10;
+        }
+    }
+
+    N = 0;
+    maxdiff = 10;//sets maxdiff to arbitary value so it will enter the while loop
+
+    while(maxdiff>0.001)
+    {
+        for(j=1; j<=13; j++)//central blocks (not edges/corners)
+        {
+            for(i=1; i<=28; i++)
+            {
+            ir = i+1;
+            il = i-1;
+            ju = j+1;
+            jd = j-1;
+            Vn[i][j] = (Vo[ir][j] + Vo[il][j] + Vo[i][ju] +Vo[i][jd])/4;
+            }
+        }
+        for(i=1; i<29; i++)//bottom edge (j=0)
+        {
+            j = 0;
+
+            ir = i+1;
+            il = i-1;
+            ju = j+1;
+            Vn[i][j] = (Vo[ir][j] + Vo[il][j] + Vo[i][ju])/4;//point below is fixed at 0
+        }
+         for(i=1; i<29; i++)//top edge (j=14)
+        {
+            j = 14;
+
+            ir = i+1;
+            il = i-1;
+            jd = j-1;
+            Vn[i][j] = (Vo[ir][j] + Vo[il][j] + Vo[i][jd])/4;//point above is fixed at 0
+        }
+         for(j=1; j<14; j++)//left edge (i=0)
+        {
+            i = 0;
+
+            ir = i+1;
+            ju = j+1;
+            jd = j-1;
+            Vn[i][j] = (Vo[ir][j] + Vo[i][jd] + Vo[i][ju])/4;//point to the left is fixed at 0
+        }
+        for(j=1; j<14; j++)//right edge (i=29)
+        {
+            i = 29;
+
+            il = i-1;
+            ju = j+1;
+            jd = j-1;
+            Vn[i][j] = (Vo[il][j] + Vo[i][jd] + Vo[i][ju])/4;//point to the right is fixed at 0
+        }
+        Vn[0][0] = (Vo[0][1] + Vo[1][0])/4;//bottom left corner
+        Vn[0][14] = (Vo[0][13] + Vo[1][14])/4;//top left corner
+        Vn[29][14] = (Vo[28][14] + Vo[29][13])/4;//top right corner
+        Vn[29][0] = (Vo[29][1] + Vo[28][0])/4;//bottom right corner
+
+        for(j=6; j<9; j++)//resets left conductor to -10V
+        {
+            for(i=6; i<9; i++)
+            {
+                Vn[i][j] = -10;
+            }
+            for(i=21; i<24; i++)//resets right conductor to 10V
+            {
+                Vn[i][j] = 10;
+            }
+        }
+        maxdiff = 0;
+        for(j=0; j<15; j++)//sets Vo = Vn
+        {
+            for(i=0; i<30; i++)
+            {
+                diff = Vn[i][j] - Vo[i][j];//calculates the difference in each element between iterations
+                absdiff = fabsf(diff);
+                if(absdiff>=maxdiff)
+                    {
+                        maxdiff=absdiff;//stores the biggest difference
+                    }
+                Vo[i][j] = Vn[i][j];//sets new array to Vo ready for next iteration
+
+                printf("%1.1lf\t", Vn[i][j]);
+            }
+            printf("\n");
+        }
+
+    printf("\n\n");
+    printf("maxdiff = %lf\n",maxdiff);
+    N++;
+    }
+
+    printf("\n converged after %d iterations\n\n", N);
+
+
+
+    /* calculates Ex Ey at each point. E=-gradV */
+
+
+     for(j=1; j<=13; j++)//central blocks (not edges/corners)
+        {
+            for(i=1; i<=28; i++)
+            {
+            ir = i+1;
+            il = i-1;
+            ju = j+1;
+            jd = j-1;
+            Ex[i][j] = -(Vo[ir][j] - Vo[il][j])/(2*0.1);//Ex is -dV/dx
+            Ey[i][j] = -(Vo[i][ju] - Vo[i][jd])/(2*0.1);//Ey is -dV/dy
+            }
+        }
+        for(i=1; i<29; i++)//bottom edge (j=0)
+        {
+            j = 0;
+
+            ir = i+1;
+            il = i-1;
+            ju = j+1;
+            Ex[i][j] = -(Vo[ir][j] - Vo[il][j])/(2*0.1);//Ex is -dV/dx
+            Ey[i][j] = -(Vo[i][ju] - 0)/(2*0.1);//Ey is -dV/dy
+        }
+         for(i=1; i<29; i++)//top edge (j=14)
+        {
+            j = 14;
+
+            ir = i+1;
+            il = i-1;
+            jd = j-1;
+            Ex[i][j] = -(Vo[ir][j] - Vo[il][j])/(2*0.1);//Ex is -dV/dx
+            Ey[i][j] = -(0 - Vo[i][jd])/(2*0.1);//Ey is -dV/dy
+        }
+         for(j=1; j<14; j++)//left edge (i=0)
+        {
+            i = 0;
+
+            ir = i+1;
+            ju = j+1;
+            jd = j-1;
+            Ex[i][j] = -(Vo[ir][j] - 0)/(2*0.1);//Ex is -dV/dx
+            Ey[i][j] = -(Vo[i][ju] - Vo[i][jd])/(2*0.1);//Ey is -dV/dy
+        }
+        for(j=1; j<14; j++)//right edge (i=29)
+        {
+            i = 29;
+
+            il = i-1;
+            ju = j+1;
+            jd = j-1;
+            Ex[i][j] = -(0 - Vo[il][j])/(2*0.1);//Ex is -dV/dx
+            Ey[i][j] = -(Vo[i][ju] - Vo[i][jd])/(2*0.1);//Ey is -dV/dy
+        }
+
+        Ex[0][0] = -(Vo[1][0] - 0)/(2*0.1);//bottom left corner
+        Ey[0][0] = -(Vo[0][1] - 0)/(2*0.1);
+        Ex[0][14] = -(Vo[1][14] - 0)/(2*0.1);//top left corner
+        Ey[0][14] = -(0 - Vo[0][13])/(2*0.1);
+        Ex[29][14] = -(0 - Vo[28][14])/(2*0.1);//top right corner
+        Ey[29][14] = -(0 - Vo[29][13])/(2*0.1);
+        Ex[29][0] = -(0 - Vo[28][0])/(2*0.1);//bottom right corner
+        Ey[29][0] = -(Vo[29][1] - 0)/(2*0.1);
+
+
+       for(j=0; j<15; j++)//prints Ex components
+        {
+            for(i=0; i<30; i++)
+            {
+                printf("%lf\t", Ex[i][j]);
+            }
+            printf("\n");
+        }
+        printf("\n\n");
+        for(j=0; j<15; j++)//prints Ey components
+        {
+            for(i=0; i<30; i++)
+            {
+                printf("%lf\t", Ey[i][j]);
+            }
+            printf("\n");
+        }
+
+        printf("\n\n");
+
+
+    return 0;
+}

@@ -1,0 +1,184 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+int main()
+{
+    double t, x, y, vx, vy, h;
+    double xs, ys, xh, yh,xm, xms, Rmx, rm,rmmin, rmmindisp, d, e, z,j,l,i;
+    double U, E, KE, v2,r, s;
+    double x1, y1, vx1, vy1, t1;//stepped variables
+    double k1x, k2x, k3x, k4x, k1y, k2y, k3y, k4y, k1vx, k2vx, k3vx, k4vx, k1vy, k2vy, k3vy, k4vy;
+    double G, Me, Mm, m;
+
+    /*constants*/
+    G = 6.67300E-11;//m3 kg-1 s-2 - Grativational constant
+    Me = 5.92719E24;//kg - mass of the earth
+    Mm = 7.34767309E22;//kg - mass of moon
+    Rmx = rmmin = 384400E3;//m -  distance from moon to earth
+
+
+    m = 1;//kg - orbiting mass
+    t = 0;//s
+    h = 40;//s - time step
+
+    /*initial conditions */
+    x = -6990406.743;//m
+    y = 366351.6937;//m
+    vx = 549.5219237;//m/s
+    vy = 10505.98408;//m/s
+
+    //printf("t\tx\ty\tvx\tvy\n");
+   // printf("time (s)\t radius (m)\t speed (m/s)\t Total energy (J)\n");
+
+    //printf("%lf\t%lf\t%lf\t%lf\n",t, r, s,E);
+    //printf("%lf\t%lf\t%lf\t%lf\t%lf\n", t,x,y,vx,vy);
+    printf("%lf\t%lf\n",x, y);
+
+    while(t<=(20*86400))
+    {
+        /*k1*/
+        k1x = vx;
+        k1y = vy;
+        /*temp variables for Earth force calc*/
+        xs = pow(x, 2);
+        ys = pow(y, 2);
+        z = xs+ys;
+        e = pow(z,1.5);
+        d = fabsf(e);
+        /*temp variable for moon force calc */
+        xm = x - Rmx;
+        xms = pow(xm,2);
+        j=xms+ys;
+        l=pow(j,1.5);
+        i=fabsf(l);
+
+        k1vx = -(G*Me*x)/d-(G*Mm*xm)/i;
+        k1vy = -(G*Me*y)/d-(G*Mm*y)/i;
+
+
+
+        /*k2*/
+        k2x = vx + (h*k1vx)/2;
+        k2y = vy + (h*k1vy)/2;
+
+        xh = x + (h*k1x)/2;
+        yh = y + (h*k1y)/2;
+        /*temp variables for Earth force calc*/
+        xs = pow(xh,2);
+        ys = pow(yh,2);
+        z = xs+ys;
+        e = pow(z,1.5);
+        d = fabsf(e);
+        /*temp variable for moon force calc */
+        xm = xh - Rmx;
+        xms = pow(xm,2);
+        j=xms+ys;
+        l=pow(j,1.5);
+        i=fabsf(l);
+
+        k2vx = -(G*Me*xh)/d-(G*Mm*xm)/i;
+        k2vy = -(G*Me*yh)/d-(G*Mm*yh)/i;
+
+
+
+        /*k3*/
+        k3x = vx + (h*k2vx)/2;
+        k3y = vy + (h*k2vy)/2;
+
+        xh = x + (h*k2x)/2;
+        yh = y + (h*k2y)/2;
+        /*temp variables for Earth force calc*/
+        xs = pow(xh,2);
+        ys = pow(yh,2);
+        z = xs+ys;
+        e = pow(z,1.5);
+        d = fabsf(e);
+         /*temp variable for moon force calc */
+        xm = xh - Rmx;
+        xms = pow(xm,2);
+        j=xms+ys;
+        l=pow(j,1.5);
+        i=fabsf(l);
+
+        k3vx = -(G*Me*xh)/d-(G*Mm*xm)/i;
+        k3vy = -(G*Me*yh)/d-(G*Mm*yh)/i;
+
+        /*k4*/
+        k4x = vx + h*k3vx;
+        k4y = vy + h*k3vy;
+
+        xh = x + h*k3x;
+        yh = y + h*k3y;
+        /*temp variables for Earth force calc*/
+        xs = pow(xh,2);
+        ys = pow(yh,2);
+        z = xs+ys;
+        e = pow(z,1.5);
+        d = fabsf(e);
+          /*temp variable for moon force calc */
+        xm = xh - Rmx;
+        xms = pow(xm,2);
+        j=xms+ys;
+        l=pow(j,1.5);
+        i=fabsf(l);
+
+        k4vx = -(G*Me*xh)/d-(G*Mm*xm)/i;
+        k4vy = -(G*Me*yh)/d-(G*Mm*yh)/i;
+
+
+
+        /* time stepping eqns */
+        x1 = x + (h/6)*(k1x + 2*k2x + 2*k3x + k4x);
+        y1 = y + (h/6)*(k1y + 2*k2y + 2*k3y + k4y);
+        vx1 = vx + (h/6)*(k1vx + 2*k2vx + 2*k3vx + k4vx);
+        vy1 = vy + (h/6)*(k1vy + 2*k2vy + 2*k3vy + k4vy);
+        t1 = t + h;
+
+        x = x1;
+        y = y1;
+        vx = vx1;
+        vy = vy1;
+        t = t1;
+
+        /*energy calculations*/
+        xm = Rmx - x;
+        rm = sqrtf(pow(xm,2)+pow(y,2));
+        r = sqrtf(fabsf(pow(x,2))+fabsf(pow(y,2)));
+        s = sqrtf(pow(vx,2)+pow(vy,2));
+
+        U = -(G*Me*m)/r-(G*Mm*m)/rm;
+        v2 = pow(s,2);
+        KE = (m*v2)/2;
+        E = KE+U;
+
+
+        //printf("%lf\t%lf\t%lf\t%lf\t%lf\n",t,x,y,vx,vy);
+        //printf("%lf\t%lf\t%lf\t%lf\n",t, r, s,E);
+      printf("%lf\t%lf\n",x, y);
+
+       if(rm<rmmin)
+       {
+           rmmin = rm;//stores the closest the particle gets to the moon
+       }
+
+       if(r<=6378.1E3)//if radius of orbit is smaller than radius of the earth the satelite crashes
+       {
+           printf("the ship crashed into earth!\n");
+           rmmindisp=(rmmin-1737E3)/1000;//subtracts the radius of the moon and gives the answer in km
+            printf("got to within %lf km from the moon\n", rmmindisp);
+           return 0;
+       }
+       if(rm<=1737E3)//if distance from moon is less than radius of the moon
+       {
+           printf("the ship crashed into moon!\n");
+           return 0;
+       }
+
+    }
+    rmmindisp=(rmmin-1737E3)/1000;//subtracts the radius of the moon and gives the answer in km
+    printf("got to within %lf km from the moon\n", rmmindisp);
+
+
+    return 0;
+}

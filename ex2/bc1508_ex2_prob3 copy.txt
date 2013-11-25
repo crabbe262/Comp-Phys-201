@@ -1,0 +1,82 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+int main()
+{
+   double x, y, sign, i, f=0, f2, Pi;
+   long int N;
+
+
+   for(N=0; N<=1e9; N++)
+   {
+       /* this code generates a random rumber between -1 and 1 by generating a random
+        number between 0 and 1. the number will then have 50% chance of
+       being assigned a minus */
+
+        x = rand()/(double)RAND_MAX;
+        sign = rand()/(double)RAND_MAX;
+        if(sign>0.5)
+        {
+            x = -x;
+        }
+
+        y = rand()/(double)RAND_MAX;
+        sign = rand()/(double)RAND_MAX;
+        if(sign>0.5)
+        {
+            y = -y;
+        }
+
+
+        i = pow(x,2) + pow(y,2);
+
+        if(i<=1)
+        {
+            f++;
+        }
+
+        Pi = 4*(f/N);
+
+
+
+
+       if(N==10)
+       {
+           printf("N=10, Pi=%lf\n", Pi);
+       }
+       if(N==100)
+       {
+           printf("N=1E2, Pi=%lf\n", Pi);
+       }
+       if(N==1000)
+       {
+           printf("N=1E3, Pi=%lf\n", Pi);
+       }
+       if(N==10000)
+       {
+           printf("N=1E4, Pi=%lf\n", Pi);
+       }
+       if(N==100000)
+       {
+           printf("N=1E5, Pi=%lf\n", Pi);
+       }
+       if(N==1000000)
+       {
+           printf("N=1E6, Pi=%lf\n", Pi);
+       }
+       if(N==10000000)
+       {
+           printf("N=1E7, Pi=%lf\n", Pi);
+       }
+       if(N==100000000)
+       {
+           printf("N=1E8, Pi=%lf\n", Pi);
+       }
+       if(N==1000000000)
+       {
+           printf("N=1E9, Pi=%lf\n", Pi);
+       }
+   }
+return 0;
+}
